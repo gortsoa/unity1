@@ -1,0 +1,111 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class walk3 : MonoBehaviour
+{
+    public GameObject mainCamera;//攝影機
+    public Animator anim;   //動畫控制器
+    public float Hor, Ver;//讀取方位值
+    public float play_rotion;//暫存方向
+    public attack attackCS;
+    public playHitBox playHitBoxCS;
+    public playerStatus playerStatus;
+    public GameObject player;
+    private string checkMonsterName;
+    public float a;
+    private bool p;
+    void Update()
+    {
+        if (!attackCS.attackSwitch)//人物沒有攻擊時正常走路
+        {            
+            walkCtrl();
+        }
+        if (attackCS.damageTimeSwitch)//人物進行攻擊
+        {
+            if (playHitBoxCS.monsterMode1 != null)//碰撞箱碰觸怪物
+            {
+                
+                if (checkMonsterName.IndexOf(playHitBoxCS.monsterMode1.name) == -1) //人物對怪物血量傷害計算
+                {                    
+                    damagecalculation.playerToMonster(player, playHitBoxCS.monsterMode1);
+                    checkMonsterName = checkMonsterName + playHitBoxCS.monsterMode1.name;
+                    Debug.Log(playHitBoxCS.monsterMode1.name);                    
+                }                
+            }
+        }
+        else
+        {
+            checkMonsterName = "";
+        }
+    }
+    void walkCtrl()//人物沒有攻擊時走路
+    {
+        play_rotion = 0;
+        Hor = Input.GetAxis("Horizontal");//水平方位
+        Ver = Input.GetAxis("Vertical");//垂直方位       
+        if ((Ver != 0) && (Hor != 0))//斜邊移動
+        {
+            play_rotion = mainCamera.transform.eulerAngles.y + (Mathf.Atan2(Hor, Ver) * Mathf.Rad2Deg);
+        }
+        else if (Ver > 0)//前
+        {
+            play_rotion = mainCamera.transform.eulerAngles.y;
+        }
+        else if (Ver < 0)//後
+        {
+            play_rotion = mainCamera.transform.eulerAngles.y + 180;
+        }
+        else if (Hor > 0)//右
+        {
+            play_rotion = mainCamera.transform.eulerAngles.y + 90;
+        }
+        else if (Hor < 0)//左
+        {
+            play_rotion = mainCamera.transform.eulerAngles.y + 270;
+        }
+        if(playerStatus.playerNowPower>30)
+        {
+            p = true;
+        }
+        if (playerStatus.playerNowPower == 0)
+        {
+            p = false;
+        }
+        if ((Hor != 0) || (Ver != 0))//當有按方向鍵時
+        {
+            transform.eulerAngles = new Vector3(0, play_rotion, 0);//設定方向
+            transform.position = transform.position + transform.forward * Time.deltaTime*a;//座標移動
+            if (Input.GetKey(KeyCode.LeftShift) )//按下方向鍵同時按下LeftShift鍵時,並且人物體力值大於零時,人物跑步
+            {
+                if(playerStatus.playerNowPower>0 & p ==true)//體力值大於零
+                { 
+                    anim.SetBool("run", true);
+                    a = 3.0f;//速度設定為3
+                    playerStatus.playerNowPower = playerStatus.playerNowPower - 0.2f;
+                }
+                else//正常行走
+                {
+                    anim.SetBool("Walk", true);
+                    anim.SetBool("run", false);
+                    a = 1.0f;//速度設定為1
+                    playerStatus.playerNowPower = playerStatus.playerNowPower + 0.2f;
+                }
+            }
+            else//正常行走
+            {
+
+                anim.SetBool("Walk", true);
+                anim.SetBool("run", false);
+                a = 1.0f;//速度設定為1
+                playerStatus.playerNowPower = playerStatus.playerNowPower + 0.2f;
+            }
+        }
+        else
+        {
+            anim.SetBool("Walk", false);
+            anim.SetBool("run", false);
+            playerStatus.playerNowPower = playerStatus.playerNowPower + 0.1f;
+        }
+    }
+}
