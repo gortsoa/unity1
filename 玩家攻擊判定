@@ -1,0 +1,40 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class attack : MonoBehaviour
+{
+    public Animator anim;
+    public bool attackSwitch;
+    public bool damageTimeSwitch;
+
+    void Update()
+    {   
+        if (Input.GetMouseButtonDown(0) )//按下滑鼠左鍵攻擊
+        {
+            anim.SetBool("Hit", true);
+        }
+    }
+    void attackStart()//攻擊開始
+    {
+        attackSwitch = true;
+    }
+    void attackEnd()//攻擊結束
+    {
+        attackSwitch = false;
+        anim.SetBool("Hit", false);
+    }
+    void attackEnd1()//攻擊結束
+    {
+        attackSwitch = false;
+        anim.SetBool("Hit", false);
+    }
+    void damageTimeStart()//傷害開始
+    {
+        damageTimeSwitch  =  true;
+    }
+    void damageTimeEnd()//傷害結束
+    {
+        damageTimeSwitch = false;
+    }
+}            
