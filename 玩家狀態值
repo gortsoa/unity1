@@ -1,0 +1,42 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement; 
+
+public class playerStatus : MonoBehaviour {
+
+    public string playerName;//人物名稱
+    public int playerMaxHp;//人物最大血量
+    public int playerNowHp;//人物目前血量
+    public int playerAttack;//人物攻擊力
+    public int playerDefense;//人物防禦力
+    public float playerMaxPower=100.0f;//人物最大體力
+    public float playerNowPower=100.0f;//人物目前體力
+    public bool B;
+    public GameObject endimage;
+    void Start()
+    {
+        endimage.SetActive(false);//結束畫面預設為關閉
+    }
+    void Update()
+    {
+        if (playerNowPower  > playerMaxPower )//設定人物目前力量小於最大力量
+        {
+            playerNowPower = playerMaxPower;
+        }
+        if (playerNowPower < 0f)//設定人物目前力量小於最大力量
+        {
+            playerNowPower = 0f;
+        }
+        if (playerNowHp > playerMaxHp)//設定人物目前血量小於最大血量
+        {
+            playerNowHp = playerMaxHp;
+        }
+        if (playerNowHp < 0)//人物血量小於0
+        {
+            endimage.SetActive(true);//開啟結束畫面
+            B = true;//顯示鼠標
+            Time.timeScale = 0f;//遊戲暫停
+        }
+    }
+}
