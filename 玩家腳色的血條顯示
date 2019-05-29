@@ -1,0 +1,16 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class PlayHP : MonoBehaviour
+{
+    public playerStatus playCS;
+    private float nowHP, maxHP;
+    void Update()
+    {
+        nowHP = playCS.playerNowHp;
+        maxHP = playCS.playerMaxHp;
+        transform.localPosition = new Vector3(-200 + 200f * nowHP / maxHP, 0f, 0f);
+    }
+}
