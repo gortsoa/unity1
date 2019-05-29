@@ -1,0 +1,12 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class damagecalculation : MonoBehaviour {//玩家對怪物的傷害計算
+    public static void playerToMonster(GameObject player,GameObject monster)
+    {
+        monsterStatus monsterValue = monster.GetComponent<monsterStatus>();
+        playerStatus playerValue = player.GetComponent<playerStatus>();
+        monsterValue.monsterNowHp = monsterValue.monsterNowHp - (playerValue.playerAttack - monsterValue.monsterDefense);
+    }
+}
