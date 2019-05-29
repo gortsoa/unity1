@@ -25,3 +25,4 @@ public class monsterStatus : MonoBehaviour {
             LevelManager1.score = LevelManager1.score + 5;//分數加5
         }
     }
+}
