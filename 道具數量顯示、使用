@@ -1,0 +1,31 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class prop : MonoBehaviour {
+    public int propa;
+    public Text proptext;
+    public playerStatus playerStatus;
+    void Start () {
+        propa = 3;
+    }
+	void Update () {
+        proptext.text = "" + propa;
+        if (propa > 0)
+        {
+            if (Input.GetKeyDown(KeyCode.E))//按下按鍵E回血
+            {
+                if (playerStatus.playerNowHp < 100)
+                {
+                    playerStatus.playerNowHp = playerStatus.playerNowHp + 10;//血量加10
+                    propa = propa - 1;//減少一個回血道具
+                }
+            }
+        }
+        if (propa <= 0)//回血道具小於零時維持零
+        {
+            propa = 0;
+        }
+    }
+}
