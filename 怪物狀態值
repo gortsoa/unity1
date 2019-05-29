@@ -1,0 +1,27 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+public class monsterStatus : MonoBehaviour {
+    public string monsterName; //怪物名稱
+    public int monsterMaxHp;//怪物最大血量
+    public int monsterNowHp;//怪物最大血量
+    public int monsterAttack;//怪物攻擊力
+    public int monsterDefense;//怪物防禦力
+    public GameObject monster;
+    public GameObject abcd;
+    public GameObject blood;
+    public LevelManager1 LevelManager1;
+	void Update () {
+
+        if (monsterNowHp <= 0)//怪物血量小於0
+        {
+            int r = Random.Range(1, 101);
+            if(r<=50)//50%的機率掉落回血道具
+            {
+             Instantiate(blood, transform.position, transform.rotation);
+            }
+            Destroy(monster);
+            Instantiate(abcd, transform.position, transform.rotation);//死亡特效
+            LevelManager1.score = LevelManager1.score + 5;//分數加5
+        }
+    }
