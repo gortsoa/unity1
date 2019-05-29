@@ -1,0 +1,216 @@
+using UnityEngine;
+using System.Collections;
+using UnityEngine.UI;
+using UnityEngine.AI;
+
+enum AIStatus {
+	Idle, Walk, Run, 
+	CloseToPlayer,SmallMagicAttack	 
+}
+
+public class MageAI : MonoBehaviour {    
+[SerializeField] float m_SeeRange, m_AttackRange;    
+[SerializeField] Animator m_Animator;               
+[SerializeField] NavMeshAgent m_NavMeshAgent;       
+[SerializeField] GameObject  m_AreaMagicEffect, monster;
+public monsterHitBox monsterHitBoxCS;
+public bool monsterdamageTimeSwitch;
+private string checkplayName;
+void monsterdamageTimeStart()//攻擊判定
+{
+  monsterdamageTimeSwitch = true;
+}
+void monsterdamageTimeEnd()
+{
+  monsterdamageTimeSwitch = false;
+}
+AIStatus m_AIStatus = AIStatus.Idle;
+float m_ActionDuration = 0;
+Transform m_PlayerTransform;
+bool m_IsAction = false;                 
+Vector3 m_OriginPosition; 
+ 
+void Start ()//記錄AI一開始所在的位置
+{
+m_OriginPosition = transform.position;  
+}
+void Update () {
+if (monsterdamageTimeSwitch)//傷害判定
+{
+if (monsterHitBoxCS.play != null)
+{           
+if (checkplayName.IndexOf(monsterHitBoxCS.play.name) == -1)
+{
+playdamagecalculation.MonsterToplayer(monster, monsterHitBoxCS.play);
+checkplayName = checkplayName + monsterHitBoxCS.play.name;
+Debug.Log(monsterHitBoxCS.play.name);                    
+        }
+    }       
+}
+else
+{
+checkplayName = "";
+}
+if (Time.time > m_ActionDuration)//每個行為的持續時間
+{           
+m_IsAction = false;//重置AI行為                        
+Collider[] playerColliders = Physics.OverlapSphere (transform.position, m_SeeRange, 1 << 8);//偵測指定的半徑內是否有碰撞箱
+int r = Random.Range (1, 101);
+if (playerColliders.Length > 0)//當玩家進入可見範圍時，取得玩家的Transform參考
+{            
+if (m_PlayerTransform == null)
+{
+m_PlayerTransform = playerColliders [0].transform;
+}
+if (Vector3.Distance (transform.position, m_PlayerTransform.position) > m_AttackRange)//靠近玩家直到AI可攻擊的範圍
+{
+ m_AIStatus = AIStatus.CloseToPlayer;
+					}
+else
+{
+if (Vector3.Distance (transform.position, m_PlayerTransform.position) > 5) //距離大於5靠近玩家
+{
+m_AIStatus = AIStatus.CloseToPlayer;
+}
+else//距離小於5攻擊玩家                                    
+{                                                                                                  
+ m_AIStatus = AIStatus.SmallMagicAttack;
+		}
+	}
+}
+else
+{
+if (r <= 60)//60%機率發呆
+{                            
+m_AIStatus = AIStatus.Idle;           
+}
+else//40%機率隨意走動
+{
+                m_AIStatus = AIStatus.Walk;           
+                }
+}
+}
+switch (m_AIStatus)
+{
+case AIStatus.Walk:
+	Walk ();
+	break;
+case AIStatus.CloseToPlayer:
+	CloseToPlayer ();
+	break;
+	case AIStatus.SmallMagicAttack:
+		SmallMagicAttack ();
+		break;
+	default:
+	Idle ();
+	break;
+	}
+}
+void OnDrawGizmos()
+{
+	Gizmos.color = Color.cyan;
+	Gizmos.DrawWireSphere (transform.position, m_SeeRange);
+	Gizmos.color = Color.red;
+	Gizmos.DrawWireSphere (transform.position, m_AttackRange);
+	Gizmos.color = Color.yellow;
+	Gizmos.DrawWireSphere (m_NavMeshAgent.destination, 0.2f);
+}
+bool GoToTarget(bool forward)//決定移動到何處的副程式
+{                            
+	bool isValid = false;
+	float x = Random.Range (0f, 2f);//決定AI腳色往前或往後走
+	float z;
+	if(forward) z = Random.Range (3f, 5f);               
+	else z = Random.Range (-3f, -5f);
+	Vector3 rayOrigin = transform.TransformPoint(new Vector3 (x, 1000, z));
+
+	Ray ray = new Ray (rayOrigin, -Vector3.up);//檢查是否有AI導航網格存在
+	RaycastHit rayCastHit;
+	if (Physics.Raycast (ray, out rayCastHit))
+{             
+NavMeshHit navMeshHit;
+if (NavMesh.SamplePosition (rayCastHit.point, out navMeshHit, 1, -1))
+{      
+		m_NavMeshAgent.destination = navMeshHit.position;
+		isValid = true;
+		}
+	}
+return isValid;
+}
+Quaternion GetRotation(Vector3 target, bool forward)//當有導航路線存在時，計算出AI腳色應面向的角度
+{                          
+	if (m_NavMeshAgent.hasPath)
+   {
+			Vector3 a = new Vector3 (m_NavMeshAgent.path.corners [0].x, 0, m_NavMeshAgent.path.corners [0].z);
+			Vector3 b = new Vector3 (m_NavMeshAgent.path.corners [1].x, 0, m_NavMeshAgent.path.corners [1].z);
+			if(forward) return Quaternion.LookRotation (b - a);
+			else return Quaternion.LookRotation (a - b);
+		}
+        else//不存在路線時，角度與當前AI角色角度一致                                                                            
+        {                                                        
+			return transform.rotation;
+		}
+	}
+
+	void Walk()//走路
+    {
+		if (!m_IsAction)
+        {
+			m_IsAction = true;
+			m_ActionDuration = Time.time + 5f;
+			if (!GoToTarget (true))
+            {
+				GoToTarget (false);
+			}
+		}
+
+		m_Animator.SetFloat ("Speed", Mathf.Lerp(m_Animator.GetFloat("Speed"), 0.5f, 0.1f));
+		transform.rotation = Quaternion.Lerp (transform.rotation, GetRotation (m_NavMeshAgent.destination, true), 0.1f);
+
+		if (Vector3.Distance(transform.position, m_NavMeshAgent.destination) < 0.1f)     //若與目標距離小於0.1公尺則提早結束行走時間
+        {            
+			m_ActionDuration = 0;
+		}
+    }
+
+	void CloseToPlayer()//接近玩家
+    {
+		if (!m_IsAction)
+        {
+			m_IsAction = true;
+			m_ActionDuration = Time.time + 2f;
+	    }
+		m_NavMeshAgent.destination = m_PlayerTransform.position;
+		m_Animator.SetFloat ("Speed", Mathf.Lerp(m_Animator.GetFloat("Speed"), 0.5f, 0.1f));
+		transform.rotation = Quaternion.Lerp (transform.rotation, GetRotation (m_NavMeshAgent.destination, true), 0.1f);
+		if (Vector3.Distance(transform.position, m_NavMeshAgent.destination) < m_AttackRange)
+        {
+			m_ActionDuration = 0;
+		}
+    }
+
+	void SmallMagicAttack()//攻擊玩家
+    {
+		if (!m_IsAction)
+        {
+			m_IsAction = true;
+			m_ActionDuration = Time.time + 3f;
+			m_Animator.SetTrigger ("SmallMagicAttack");
+		}
+		m_Animator.SetFloat ("Speed", Mathf.Lerp (m_Animator.GetFloat ("Speed"), 0f, 0.1f));
+		m_NavMeshAgent.destination = m_PlayerTransform.position;
+		transform.rotation = Quaternion.Lerp (transform.rotation, GetRotation (m_NavMeshAgent.destination, true), 0.1f);
+        m_NavMeshAgent.destination = monster.transform.position;
+
+    }
+
+	void Idle()//初始化的部分設定閒置動作將維持3秒
+    {                        
+		if (!m_IsAction)
+        {
+			m_IsAction = true;
+			m_ActionDuration = Time.time + 3f;
+		}
+		m_Animator.SetFloat ("Speed", Mathf.Lerp(m_Animator.GetFloat("Speed"), 0, 0.1f));
+	}
+}
