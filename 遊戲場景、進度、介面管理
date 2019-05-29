@@ -1,0 +1,103 @@
+using UnityEngine;
+using System.Collections;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
+public class LevelManager1 : MonoBehaviour {
+    public GameObject Menu;
+    public bool a ;
+    public bool b;
+    public int score ;
+    public int r;
+    public playHitBox playHitBox;
+    public playerStatus playerStatus;
+    public Text scoretext;
+    public GameObject c,d,e;
+
+    void Start()
+    {
+        a = true;
+        b = false;
+        Menu.SetActive(false);
+        c.SetActive(false);
+        d.SetActive(false);
+        e.SetActive(false);
+        Time.timeScale = 1f;//遊戲正常運行
+        scoretext.text = "分數:";
+         r = Random.Range(1, 3);
+    }
+
+    void Update()
+    {
+        scoretext.text = "分數:"+ score;//分數計算
+        if(r == 1)//隨機選擇地圖中三個寶箱的其中一個產生
+        {
+            c.SetActive(true);
+        }
+        else if(r == 2)
+        {
+            d.SetActive(true);
+        }
+        else if (r == 3)
+        {
+            e.SetActive(true);
+        }
+
+        if (b == true)//開啟遊戲內的選單時顯示鼠標
+        {
+            Cursor.visible = true;
+        }
+        else if(playHitBox.b ==true)//開啟結算畫面時顯示鼠標
+        {
+            Cursor.visible = true;
+        }
+        else if (playerStatus.B == true)//開啟結算畫面時顯示鼠標
+        {
+            Cursor.visible = true;
+        }
+        else//其他狀況隱藏鼠標
+        {
+            Cursor.visible = false;
+        }
+        if (a == true)
+        {
+            
+            if (Input.GetKeyDown(KeyCode.Escape))//玩家按下ESC按鈕
+            {
+                Menu.SetActive(true);//開啟遊戲內的選單
+                Time.timeScale = 0f;//遊戲暫停
+                b = true;
+                a = false;
+            }
+        }
+        else
+        {           
+            if (Input.GetKeyDown(KeyCode.Escape))//玩家按下ESC按鈕
+            {
+                Menu.SetActive(false); //關閉遊戲內的選單
+                Time.timeScale = 1f;//遊戲正常運行
+                b = false;
+                a = true;                
+            }
+        }
+    }
+    public void MenuQuit()//點擊按鈕回到遊戲初始畫面
+    {
+        SceneManager.LoadScene(0);
+    }
+    public void MainScreen()//點擊按鈕開始遊戲
+    {
+        SceneManager.LoadScene(1);
+    }
+    public void GameQuit()//點擊按鈕退出遊戲
+    {
+        Application.Quit();
+    }
+
+    public void GameStart()//點擊按鈕
+    {
+        Menu.SetActive(false);//關閉遊戲內選單
+        Time.timeScale = 1f;//遊戲正常運行
+        b = false;
+    }
+}
