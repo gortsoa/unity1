@@ -1,0 +1,67 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class playHitBox : MonoBehaviour
+{
+    public GameObject monsterMode1 =null;
+    public GameObject a;
+    public GameObject chest;
+    public prop propcs;
+    public GameObject endimage;
+    public LevelManager1 LevelManager1;
+    public bool b=false;
+
+    void Update()
+    {
+        if (a != null)//碰到道具時,按F鍵撿起道具
+        {
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                propcs.propa = propcs.propa + 1;
+                Destroy(a);
+            }
+        }
+        if (chest != null)//碰到寶箱時,按F鍵撿起寶箱並結算遊戲
+        {
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                endimage.SetActive(true);
+                b = true;
+                Time.timeScale = 0f;
+                LevelManager1.score = LevelManager1.score + 100;
+            }
+        }
+    }
+    void OnCollisionExit(Collision other)//碰撞箱沒有碰撞
+    {
+
+        if (other.gameObject.tag == "monster")
+        {
+            monsterMode1 = null;
+        }
+        if (other.gameObject.tag == "prop")
+        {
+            a = null;
+        }
+        if (other.gameObject.tag == "chest")
+        {
+            chest = null;
+        }
+    }
+    void OnCollisionStay(Collision other)//碰撞箱產生碰撞
+    {
+        if (other.gameObject.tag == "monster")
+        {
+            monsterMode1 = other.gameObject;
+        }
+        if (other.gameObject.tag == "prop")
+        {
+            a = other.gameObject;
+        }
+        if (other.gameObject.tag == "chest")
+        {
+            chest = other.gameObject;
+        }
+    }
+}
