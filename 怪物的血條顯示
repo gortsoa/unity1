@@ -1,0 +1,15 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class monsterHP : MonoBehaviour {
+    public monsterStatus monsterCS;
+    private float nowHP, maxHP;
+	void Update ()
+    {        
+        nowHP = monsterCS.monsterNowHp;
+        maxHP = monsterCS.monsterMaxHp;
+        transform.localPosition = new Vector3( -100 + 100f * nowHP / maxHP, 0f, 0f);       
+    }
+}
