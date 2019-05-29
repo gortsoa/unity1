@@ -1,0 +1,15 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class PlayPower : MonoBehaviour {
+    public playerStatus playCS;
+    private float nowPower, maxPower;
+	void Update ()
+    {
+        nowPower = playCS.playerNowPower;
+        maxPower = playCS.playerMaxPower;
+        transform.localPosition = new Vector3(-200 + 200f * nowPower / maxPower, 0f, 0f);
+    }
+}
