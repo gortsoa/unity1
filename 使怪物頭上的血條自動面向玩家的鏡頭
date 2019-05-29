@@ -1,0 +1,10 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class HPcamera : MonoBehaviour {//使怪物頭上的血條自動面向玩家的攝影機
+    void Update () {
+        this.transform.LookAt(Camera.main.transform.position);
+        this.transform.rotation = Quaternion.Slerp(this.transform.rotation, Quaternion.LookRotation(Camera.main.transform.position - this.transform.position), 0);    
+    }
+}
