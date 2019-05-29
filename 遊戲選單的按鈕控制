@@ -1,0 +1,20 @@
+using UnityEngine;
+using System.Collections;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
+public class UITest2 : MonoBehaviour
+{
+    public void OnBtn()//按下按鈕開始遊戲
+    {
+       SceneManager.LoadScene(1);
+    }
+    public void GameQuit()//按下按鈕退出遊戲到桌面
+    {
+        Application.Quit();
+    }
+    void Update()//在選單時顯示滑鼠
+    {
+      Cursor.visible = true;
+    }
+}
