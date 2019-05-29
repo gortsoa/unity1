@@ -1,0 +1,26 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class propHitBox : MonoBehaviour//道具被觸碰時顯示撿取的提示
+{
+    public GameObject Canva;
+   void Start()
+    {
+        Canva.SetActive(false);
+    }
+    void OnCollisionExit(Collision other)
+    {
+        if (other.gameObject.tag == "Player")
+        {
+          Canva.SetActive(false); 
+        }
+    }
+    void OnCollisionStay(Collision other)
+    {
+        if (other.gameObject.tag == "Player")
+        {
+            Canva.SetActive(true);
+        }
+    }
+}
